@@ -1,6 +1,9 @@
 import { useState } from "react";
 import idl from "./idl/idl.json";
 import { Connection, PublicKey } from "@solana/web3.js";
+import * as anchor from "@coral-xyz/anchor";
+import { AnchorProvider } from "@coral-xyz/anchor";
+
 import InitializeTreasury from "./components/InitializeTreasury";
 import BuyTokens from "./components/BuyTokens";
 import RegisterVoter from "./components/RegisterVoter";
@@ -15,52 +18,55 @@ import VoterInfo from "./components/VoterInfo";
 import ProposalInfo from "./components/ProposalInfo";
 import AllProposals from "./components/AllProposals";
 import TreasuryInfo from "./components/TreasuryInfo";
-import * as anchor from "@coral-xyz/anchor";
-import { AnchorProvider } from "@coral-xyz/anchor";
 
 import "./App.css";
 
-const programID = new PublicKey(idl.address); //programID is the public key of the program
+const programID = new PublicKey(idl.address);
 const idlWithAddress = { ...idl, address: programID.toBase58() };
-
-// Network configuration - switch between local and devnet
-// Local: "http://127.0.0.1:8899"
-// Devnet: "https://api.devnet.solana.com"
 
 const network = "https://api.devnet.solana.com";
 const connection = new Connection(network, "processed");
 
-//getProvider function
 const getProvider = () => {
-  const provider = new AnchorProvider(connection, window.solana, anchor.AnchorProvider.defaultOptions()
+  return new AnchorProvider(
+    connection,
+    window.solana,
+    anchor.AnchorProvider.defaultOptions()
   );
-  return provider;
 };
 
 function App() {
   const [loading, setLoading] = useState(false);
   const [walletAddress, setWalletAddress] = useState(null);
   const [error, setError] = useState(null);
-  const [currentPage, setCurrentPage] = useState("user"); // 'user' or 'admin'
 
-  // Connect Wallet
+  const [currentPage, setCurrentPage] = useState("user");
+
+  // 🔐 admin auth states
+  const [showAdminAuth, setShowAdminAuth] = useState(false);
+  const [adminPassword, setAdminPassword] = useState("");
+  const [adminError, setAdminError] = useState("");
+  const [isAdminAuthorized, setIsAdminAuthorized] = useState(false);
+
+  // -------------------------
+  // Wallet connect
+  // -------------------------
   const connectWallet = async () => {
-    if(window.solana){
-      try{
-        setLoading(true);
-        await window.solana.connect();
-        const walletAddress = window.solana.publicKey.toString();
-        setWalletAddress(walletAddress);
-        setError(null);
-      }catch(err){
-        console.error("Error connecting wallet:", err);
-        setError("Failed to connect wallet");
-      }finally{
-        setLoading(false);
-      }
-    }else{
-      console.log("No Solana extension found");
-      setError("Please install Solana extension");
+    if (!window.solana) {
+      setError("Please install Phantom wallet");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await window.solana.connect();
+      setWalletAddress(window.solana.publicKey.toString());
+      setError(null);
+    } catch (err) {
+      console.error(err);
+      setError("Wallet connection failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,18 +75,35 @@ function App() {
     return `${address.slice(0, 4)}...${address.slice(-4)}`;
   };
 
+  // -------------------------
+  // Admin password check
+  // -------------------------
+  const verifyAdminPassword = () => {
+    if (adminPassword === "Untrusted@1234") {
+      setIsAdminAuthorized(true);
+      setShowAdminAuth(false);
+      setCurrentPage("admin");
+      setAdminPassword("");
+      setAdminError("");
+    } else {
+      setAdminError("Invalid admin password");
+    }
+  };
+
   return (
     <div className="app-container">
-      {/* Header */}
+      {/* ================= HEADER ================= */}
       <header className="header">
         <div className="header-content">
           <h1 className="app-title">Solana Voting dApp</h1>
+
           <div className="wallet-section">
             {walletAddress && (
               <span className="wallet-address" title={walletAddress}>
                 {shortenAddress(walletAddress)}
               </span>
             )}
+
             <button
               className="connect-btn"
               onClick={connectWallet}
@@ -89,15 +112,16 @@ function App() {
               {loading
                 ? "Connecting..."
                 : walletAddress
-                  ? "Connected"
-                  : "Connect Wallet"}
+                ? "Connected"
+                : "Connect Wallet"}
             </button>
           </div>
         </div>
+
         {error && <p className="status-message error">{error}</p>}
       </header>
 
-      {/* Navigation Tabs */}
+      {/* ================= NAV ================= */}
       <nav className="page-nav">
         <button
           className={`nav-tab ${currentPage === "user" ? "active" : ""}`}
@@ -105,19 +129,26 @@ function App() {
         >
           🗳️ Voting
         </button>
+
         <button
           className={`nav-tab ${currentPage === "admin" ? "active" : ""}`}
-          onClick={() => setCurrentPage("admin")}
+          onClick={() => {
+            if (!isAdminAuthorized) {
+              setShowAdminAuth(true);
+            } else {
+              setCurrentPage("admin");
+            }
+          }}
         >
           ⚙️ Admin
         </button>
       </nav>
 
-      {/* Main Content */}
+      {/* ================= MAIN ================= */}
       <main className="main-content">
         {currentPage === "user" ? (
           <>
-            {/* All Proposals Section - First */}
+            {/* All Proposals */}
             <section className="section">
               <h2 className="section-title proposals">All Proposals</h2>
               <div className="cards-grid">
@@ -129,7 +160,7 @@ function App() {
               </div>
             </section>
 
-            {/* Tokens Section */}
+            {/* Tokens */}
             <section className="section">
               <h2 className="section-title tokens">Tokens</h2>
               <div className="cards-grid">
@@ -139,6 +170,7 @@ function App() {
                   getProvider={getProvider}
                   connection={connection}
                 />
+
                 <BuyTokens
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
@@ -148,7 +180,7 @@ function App() {
               </div>
             </section>
 
-            {/* Voter Section */}
+            {/* Voter */}
             <section className="section">
               <h2 className="section-title voter">Voter Management</h2>
               <div className="cards-grid">
@@ -157,11 +189,13 @@ function App() {
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <RegisterVoter
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <CloseVoter
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
@@ -170,7 +204,7 @@ function App() {
               </div>
             </section>
 
-            {/* Proposal Actions Section */}
+            {/* Proposal actions */}
             <section className="section">
               <h2 className="section-title proposals">Proposal Actions</h2>
               <div className="cards-grid">
@@ -179,21 +213,25 @@ function App() {
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <ProposalInfo
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <Vote
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <PickWinner
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <CloseProposal
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
@@ -204,19 +242,20 @@ function App() {
           </>
         ) : (
           <>
-            {/* Admin Page */}
+            {/* Admin page */}
             <section className="section">
               <h2 className="section-title admin">Admin Controls</h2>
               <p className="section-description">
-                Initialize and manage the treasury. Only the authority can
-                perform these actions.
+                Only authorized admin can manage treasury.
               </p>
+
               <div className="cards-grid">
                 <InitializeTreasury
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
                   getProvider={getProvider}
                 />
+
                 <WithdrawSol
                   walletAddress={walletAddress}
                   idlWithAddress={idlWithAddress}
@@ -225,7 +264,6 @@ function App() {
               </div>
             </section>
 
-            {/* Treasury Details on Admin Page */}
             <section className="section">
               <h2 className="section-title treasury">Treasury Details</h2>
               <div className="cards-grid">
@@ -239,6 +277,38 @@ function App() {
           </>
         )}
       </main>
+
+      {/* ================= ADMIN PASSWORD MODAL ================= */}
+      {showAdminAuth && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <h3>Admin Access</h3>
+
+            <input
+              type="password"
+              placeholder="Enter admin password"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+            />
+
+            {adminError && <p className="error">{adminError}</p>}
+
+            <div className="modal-actions">
+              <button onClick={verifyAdminPassword}>Enter</button>
+              <button
+                className="cancel"
+                onClick={() => {
+                  setShowAdminAuth(false);
+                  setAdminPassword("");
+                  setAdminError("");
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

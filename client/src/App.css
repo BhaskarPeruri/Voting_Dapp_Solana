@@ -631,3 +631,105 @@
     gap: 0.25rem;
   }
 }
+
+
+/* ===========================
+   Admin Password Modal
+=========================== */
+
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.admin-modal {
+  background: #1a202c;
+  border-radius: 14px;
+  padding: 2rem;
+  width: 340px;
+  border: 1px solid #4a5568;
+
+  /* 🔥 glowing box shadow */
+  box-shadow:
+    0 0 25px rgba(102, 126, 234, 0.45),
+    0 0 60px rgba(118, 75, 162, 0.25);
+
+  animation: adminPop 0.25s ease-in-out;
+}
+
+.admin-modal h3 {
+  margin: 0 0 1.25rem 0;
+  text-align: center;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+.admin-modal input {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #4a5568;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 0.95rem;
+  color: #e2e8f0;
+  margin-bottom: 1rem;
+}
+
+.admin-modal input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.25);
+}
+
+.admin-modal .error {
+  color: #fc8181;
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 0.75rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.modal-actions button {
+  flex: 1;
+  border-radius: 10px;
+  padding: 0.7rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+.modal-actions button:first-child {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.modal-actions .cancel {
+  background: #2d3748;
+  color: #e2e8f0;
+}
+
+.modal-actions button:hover {
+  filter: brightness(1.1);
+}
+
+@keyframes adminPop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
