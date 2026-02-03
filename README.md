@@ -4,7 +4,7 @@ A decentralized voting application built on **Solana** using the **Anchor framew
 
 ---
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 programs/solana_vote_dapp/src/
@@ -17,7 +17,7 @@ programs/solana_vote_dapp/src/
 
 ---
 
-## 🧠 Core Concepts
+## Core Concepts
 
 * **Treasury-backed voting**: A treasury is initialized with its own mint (`x_mint`) and token account.
 * **Proposal-based governance**: Users can create proposals and vote within a deadline.
@@ -26,7 +26,7 @@ programs/solana_vote_dapp/src/
 
 ---
 
-## 🚀 Instructions
+## Instructions
 
 ### 1. Initialize Treasury
 
@@ -57,14 +57,14 @@ Allows users to buy voting tokens by transferring SOL to the vault and receiving
 
 **Instruction**: `buy_tokens`
 
-> ⚠️ Logic partially implemented. Expected flow:
+> Logic partially implemented. Expected flow:
 >
 > 1. Transfer SOL from buyer → vault
 > 2. Mint `x_mint` tokens to buyer
 
 ---
 
-## 🗂️ On-Chain State Accounts
+## On-Chain State Accounts
 
 ### `TreasuryConfig`
 
@@ -130,7 +130,7 @@ Stores the winning proposal after voting ends.
 
 ---
 
-## 📣 Events
+## Events
 
 Emitted for off-chain consumers and indexers.
 
@@ -140,7 +140,7 @@ Emitted for off-chain consumers and indexers.
 
 ---
 
-## ❌ Error Codes
+## Error Codes
 
 ### Voting Errors
 
@@ -161,7 +161,7 @@ Emitted for off-chain consumers and indexers.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 * **Solana**
 * **Anchor Framework**
@@ -169,25 +169,11 @@ Emitted for off-chain consumers and indexers.
 
 ---
 
-## 🔐 Security & Audit Notes
+## Security & Audit Notes
 
 * PDA seeds are used consistently for treasury, mint authority, and vaults
 * Proposal counter overflow is guarded
 * Authority checks enforced via stored pubkeys
 * Deadlines are validated using on-chain timestamps
 
----
 
-## 📌 TODO / Improvements
-
-* Complete `buy_tokens` instruction
-* Add vote casting & winner declaration instructions
-* Add SOL withdrawal logic
-* Add integration tests
-* Expand proposal ID size beyond `u8`
-
----
-
-## 📄 License
-
-MIT
