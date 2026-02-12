@@ -1,0 +1,113 @@
+/* Admin Page Styles */
+@import "./TokensPage.css";
+
+/* Admin Auth Container */
+.admin-auth-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 200px);
+  padding: 2rem 1.5rem;
+}
+
+.admin-auth-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 3rem;
+  max-width: 400px;
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 30px rgba(0, 82, 204, 0.1);
+  text-align: center;
+}
+
+.auth-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.admin-auth-card h2 {
+  font-size: 1.8rem;
+  color: #0f172a;
+  margin: 0 0 0.75rem 0;
+}
+
+.admin-auth-card p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+}
+
+.auth-input {
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 0.875rem 1rem;
+  font-size: 1rem;
+  color: #0f172a;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: #0052cc;
+  box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.2);
+}
+
+.auth-input::placeholder {
+  color: #94a3b8;
+}
+
+.auth-error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin: 0 0 1rem 0;
+  background: rgba(220, 38, 38, 0.1);
+  padding: 0.75rem;
+  border-radius: 6px;
+  border-left: 3px solid #dc2626;
+}
+
+.auth-btn {
+  background: linear-gradient(135deg, #0052cc 0%, #003a99 100%);
+  color: white;
+  border: none;
+  padding: 0.875rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+  transition: all 0.3s ease;
+}
+
+.auth-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 82, 204, 0.4);
+}
+
+.auth-hint {
+  color: #64748b;
+  font-size: 0.85rem;
+  margin: 1rem 0 0 0;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .admin-auth-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .admin-auth-card h2 {
+    font-size: 1.5rem;
+  }
+
+  .auth-icon {
+    font-size: 3rem;
+  }
+}
